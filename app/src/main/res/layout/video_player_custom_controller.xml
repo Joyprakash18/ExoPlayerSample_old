@@ -10,11 +10,11 @@
         android:id="@+id/bottomContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:background="@drawable/video_controller_gradiant_background_bottom"
-        android:visibility="gone"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible">
 
         <TextView
@@ -69,38 +69,38 @@
         android:id="@+id/playPause"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_pause"
-        android:visibility="gone"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/counter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="15"
         android:textColor="@color/colorWhite"
         android:textSize="20sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"
-        tools:visibility="visible"/>
+        tools:text="15"
+        tools:visibility="visible" />
 
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/topContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:background="@drawable/video_controller_gradiant_background_top"
-        android:visibility="gone"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible">
 
         <ImageView
@@ -111,12 +111,12 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:padding="8dp"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_screen_rotation"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/back"
@@ -126,12 +126,12 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:padding="8dp"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_back"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/controllerLock"
@@ -141,12 +141,12 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:padding="8dp"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/screenRotation"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_lock"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/title"
@@ -157,13 +157,57 @@
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/back"
             app:layout_constraintStart_toEndOf="@+id/back"
             app:layout_constraintTop_toTopOf="@+id/back"
             tools:text="title"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
     </android.support.constraint.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/increaseSpeed"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#40000000"
+        android:gravity="center"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:text="+"
+        android:textColor="@color/colorWhite"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/speedText"
+        app:layout_constraintEnd_toEndOf="@+id/speedText"
+        app:layout_constraintStart_toStartOf="@+id/speedText" />
+
+    <TextView
+        android:id="@+id/speedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="1.00 x"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="#40000000"/>
+
+    <TextView
+        android:id="@+id/decreaseSpeed"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="-"
+        android:textColor="@color/colorWhite"
+        android:textSize="20sp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="@+id/speedText"
+        app:layout_constraintStart_toStartOf="@+id/speedText"
+        app:layout_constraintTop_toBottomOf="@+id/speedText"
+        android:background="#40000000"/>
 
 </android.support.constraint.ConstraintLayout>

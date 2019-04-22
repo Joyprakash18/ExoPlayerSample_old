@@ -25,6 +25,7 @@ import com.dc.exoplayersample.R;
 import com.dc.exoplayersample.api.ApiClient;
 import com.dc.exoplayersample.api.ApiInterface;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -75,6 +76,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private boolean isHorizontalScrolling = false;
     private boolean isVerticalScrolling = false;
     private ProgressBar progress;
+    private TextView increaseSpeed;
+    private TextView speedText;
+    private TextView decreaseSpeed;
+    private float speed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +119,28 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 setPlayPause();
             }
         });
-
+        increaseSpeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(player != null){
+                    speed += 0.25f;
+                    player.setPlaybackParameters(new PlaybackParameters(speed));
+                    speedText.setText(String.format("%s x", speed));
+                }
+            }
+        });
+        decreaseSpeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(player != null){
+                    if (speed > 0.25f) {
+                        speed -= 0.25f;
+                        player.setPlaybackParameters(new PlaybackParameters(speed));
+                        speedText.setText(String.format("%s x", speed));
+                    }
+                }
+            }
+        });
         simpleExoPlayerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -188,6 +214,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
         playPause = simpleExoPlayerView.findViewById(R.id.playPause);
         back = simpleExoPlayerView.findViewById(R.id.back);
         counter = simpleExoPlayerView.findViewById(R.id.counter);
+        increaseSpeed = simpleExoPlayerView.findViewById(R.id.increaseSpeed);
+        speedText = simpleExoPlayerView.findViewById(R.id.speedText);
+        decreaseSpeed = simpleExoPlayerView.findViewById(R.id.decreaseSpeed);
 
     }
 
@@ -250,11 +279,18 @@ public class VideoPlayerActivity extends AppCompatActivity {
             controllerLock.setVisibility(View.VISIBLE);
             title.setVisibility(View.GONE);
             topContainer.setBackground(null);
+            increaseSpeed.setVisibility(View.GONE);
+            decreaseSpeed.setVisibility(View.GONE);
+            speedText.setVisibility(View.GONE);
+
         } else if (isControllingVolume || isControllingBrightness) {
             bottomContainer.setVisibility(View.GONE);
             playPause.setVisibility(View.GONE);
             counter.setVisibility(View.VISIBLE);
             topContainer.setVisibility(View.GONE);
+            increaseSpeed.setVisibility(View.GONE);
+            decreaseSpeed.setVisibility(View.GONE);
+            speedText.setVisibility(View.GONE);
         } else {
             bottomContainer.setVisibility(View.VISIBLE);
             playPause.setVisibility(View.VISIBLE);
@@ -264,6 +300,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
             back.setVisibility(View.VISIBLE);
             controllerLock.setVisibility(View.VISIBLE);
             title.setVisibility(View.VISIBLE);
+            increaseSpeed.setVisibility(View.VISIBLE);
+            decreaseSpeed.setVisibility(View.VISIBLE);
+            speedText.setVisibility(View.VISIBLE);
         }
     }
 
@@ -332,6 +371,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
         playPause.setVisibility(View.GONE);
         counter.setVisibility(View.VISIBLE);
         topContainer.setVisibility(View.GONE);
+        increaseSpeed.setVisibility(View.GONE);
+        decreaseSpeed.setVisibility(View.GONE);
+        speedText.setVisibility(View.GONE);
         simpleExoPlayerView.showController();
         if (motionDownXPosition > event.getX()) { //swiped left
             newDuration = currentDuration - 500;
@@ -349,7 +391,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         long hours = TimeUnit.MILLISECONDS.toHours(player.getCurrentPosition());
         long minutes = TimeUnit.MILLISECONDS.toMinutes(player.getCurrentPosition()) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(player.getCurrentPosition()));
         long seconds = TimeUnit.MILLISECONDS.toSeconds(player.getCurrentPosition()) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(player.getCurrentPosition()));
-        String milliSecToHMS = String.format(Locale.ENGLISH,"%02d.%02d.%02d",hours,minutes,seconds);
+        String milliSecToHMS = String.format(Locale.ENGLISH, "%02d.%02d.%02d", hours, minutes, seconds);
         counter.setText(milliSecToHMS);
 
     }
@@ -392,6 +434,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
         initializePlayer(body.getSources());
         description.setText(body.getDescription());
         title.setText(body.getTitle());
+        if(player != null){
+            speed = player.getPlaybackParameters().speed;
+            speedText.setText(String.format("%s x", speed));
+        }
     }
 
     private void initializePlayer(String sources) {
