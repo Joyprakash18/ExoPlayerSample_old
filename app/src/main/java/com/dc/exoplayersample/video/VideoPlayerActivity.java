@@ -170,12 +170,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         repeatOnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isRepeatEnabled){
-                    repeatOnOff.setImageResource(R.drawable.ic_repeat_off);
-                }else{
-                    repeatOnOff.setImageResource(R.drawable.ic_repeat);
-                }
-                isRepeatEnabled = !isRepeatEnabled;
+                setRepeatOnOff();
             }
         });
         aspectRatio.setOnClickListener(new View.OnClickListener() {
@@ -210,6 +205,15 @@ public class VideoPlayerActivity extends AppCompatActivity {
         });
     }
 
+    private void setRepeatOnOff() {
+        if(isRepeatEnabled){
+            repeatOnOff.setImageResource(R.drawable.ic_repeat_off);
+        }else{
+            repeatOnOff.setImageResource(R.drawable.ic_repeat);
+        }
+        isRepeatEnabled = !isRepeatEnabled;
+    }
+
     private void setAspectRatio() {
         simpleExoPlayerView.showController();
         currentAspectRatio++;
@@ -241,7 +245,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
         }
 
     }
-
 
     private void set10SecForwardBackwardPlayback(boolean isIncreasing) {
         simpleExoPlayerView.showController();
