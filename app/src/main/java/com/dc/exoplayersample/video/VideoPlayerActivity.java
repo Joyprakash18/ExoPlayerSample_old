@@ -49,8 +49,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private ConstraintLayout constraintlayout;
     private PlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
-
-
     private ImageView screenRotation;
     private TextView title;
     private TextView description;
@@ -59,42 +57,42 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private ImageView back;
     private ConstraintLayout bottomContainer;
     private ConstraintLayout topContainer;
-
-
-    private AudioManager audioManager;
-    private float motionDownXPosition;
-    private float motionDownYPosition;
-
-
-    private boolean isControllingVolume = false;
-    private boolean isControllingBrightness = false;
-    private boolean isPlaying = true;
-    private boolean isControlLocked = false;
-    private int brightness = 0;
-    private boolean isHorizontalScrolling = false;
-    private boolean isVerticalScrolling = false;
-
     private ProgressBar progress;
-
-    private float speed;
     private ImageView backwardPlayback;
     private ImageView forwardPlayback;
     private ImageView volumeMute;
     private ImageView brightnessVolumeImage;
     private TextView counter;
     private Group counterGroup;
-    private boolean isControllerVisible = false;
-    private int volume;
-    private static final int maxValue = 100;
-    private static final int minValue = 0;
-    private static int horizontalScrollThreshold;
-    private static int verticalScrollThreshold = 500;
-    private boolean isControllingPlayback = false;
     private TextView increaseSpeed;
     private TextView speedText;
     private TextView decreaseSpeed;
     private Group speedControlGroup;
+    private ImageView repeatOnOff;
+    private TextView aspectRatio;
+
+    private AudioManager audioManager;
+
+    private boolean isControllingVolume = false;
+    private boolean isControllingBrightness = false;
+    private boolean isPlaying = true;
+    private boolean isControlLocked = false;
+    private boolean isHorizontalScrolling = false;
+    private boolean isVerticalScrolling = false;
+    private boolean isControllerVisible = false;
+    private boolean isControllingPlayback = false;
     private boolean isVolumeMute = false;
+    private boolean isRepeatEnabled = false;
+
+    private float speed = 0;
+    private int brightness = 0;
+    private int volume = 0;
+    private static final int maxValue = 100;
+    private static final int minValue = 0;
+    private static int horizontalScrollThreshold = 0;
+    private float motionDownXPosition = 0;
+    private float motionDownYPosition = 0;
+    private int currentAspectRatio = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +115,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
         }
         horizontalScrollThreshold = (getScreenHeightWidth()[1] / maxValue) / 2;
     }
-
 
     @SuppressLint("ClickableViewAccessibility")
     private void clickListener() {
@@ -170,6 +167,23 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 setVolumeMute();
             }
         });
+        repeatOnOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isRepeatEnabled){
+                    repeatOnOff.setImageResource(R.drawable.ic_repeat_off);
+                }else{
+                    repeatOnOff.setImageResource(R.drawable.ic_repeat);
+                }
+                isRepeatEnabled = !isRepeatEnabled;
+            }
+        });
+        aspectRatio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setAspectRatio();
+            }
+        });
         simpleExoPlayerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -196,13 +210,46 @@ public class VideoPlayerActivity extends AppCompatActivity {
         });
     }
 
+    private void setAspectRatio() {
+        simpleExoPlayerView.showController();
+        currentAspectRatio++;
+        if(currentAspectRatio > 4){
+            currentAspectRatio = 0;
+        }
+        switch (currentAspectRatio){
+            case 0:
+                simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+                aspectRatio.setText("Fit");
+                break;
+            case 1:
+                simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
+                aspectRatio.setText("V");
+                break;
+            case 2:
+                simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT);
+                aspectRatio.setText("H");
+                break;
+            case 3:
+                simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+                aspectRatio.setText("Fill");
+                break;
+            case 4:
+                simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+                aspectRatio.setText("Zoom");
+                break;
+
+        }
+
+    }
+
+
     private void set10SecForwardBackwardPlayback(boolean isIncreasing) {
         simpleExoPlayerView.showController();
         long currentDuration = player.getContentPosition();
         long totalDuration = player.getDuration();
-        if(isIncreasing){
+        if (isIncreasing) {
             currentDuration += 10000;
-        }else{
+        } else {
             currentDuration -= 10000;
         }
         if (currentDuration >= totalDuration) {
@@ -225,16 +272,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
         }
     }
 
-    private void resetValues() {
-        motionDownXPosition = 0;
-        motionDownYPosition = 0;
-        isControllingVolume = false;
-        isControllingBrightness = false;
-        isHorizontalScrolling = false;
-        isVerticalScrolling = false;
-        isControllingPlayback = false;
-    }
-
     private void setSpeedPlayback(boolean isIncreasing) {
         simpleExoPlayerView.showController();
         float speedThreshold = 0.25f;
@@ -249,18 +286,17 @@ public class VideoPlayerActivity extends AppCompatActivity {
         }
     }
 
-    private void setVolumeMute(){
+    private void setVolumeMute() {
         simpleExoPlayerView.showController();
-        if(isVolumeMute){
+        if (isVolumeMute) {
             player.setVolume(1f);
             volumeMute.setImageResource(R.drawable.ic_volume_up);
-        }else{
+        } else {
             player.setVolume(0f);
             volumeMute.setImageResource(R.drawable.ic_volume_off);
         }
         isVolumeMute = !isVolumeMute;
     }
-
 
     private void handleTouchEvent(MotionEvent event) {
         if (!isControlLocked) {
@@ -286,37 +322,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 controlPlayback(event);
             }
         }
-
-    }
-
-    private void findIds() {
-        constraintlayout = findViewById(R.id.constraintLayout);
-        simpleExoPlayerView = findViewById(R.id.simpleExoPlayerView);
-        description = findViewById(R.id.description);
-        progress = findViewById(R.id.progress);
-
-        bottomContainer = simpleExoPlayerView.findViewById(R.id.bottomContainer);
-        screenRotation = simpleExoPlayerView.findViewById(R.id.screenRotation);
-        backwardPlayback = simpleExoPlayerView.findViewById(R.id.backwardPlayback);
-        playPause = simpleExoPlayerView.findViewById(R.id.playPause);
-        forwardPlayback = simpleExoPlayerView.findViewById(R.id.forwardPlayback);
-
-
-        topContainer = simpleExoPlayerView.findViewById(R.id.topContainer);
-        back = simpleExoPlayerView.findViewById(R.id.back);
-        title = simpleExoPlayerView.findViewById(R.id.title);
-        controllerLock = simpleExoPlayerView.findViewById(R.id.controllerLock);
-        volumeMute = simpleExoPlayerView.findViewById(R.id.volumeMute);
-
-
-        brightnessVolumeImage = simpleExoPlayerView.findViewById(R.id.brightnessVolumeImage);
-        counter = simpleExoPlayerView.findViewById(R.id.counter);
-        counterGroup = simpleExoPlayerView.findViewById(R.id.counterGroup);
-
-        increaseSpeed = simpleExoPlayerView.findViewById(R.id.increaseSpeed);
-        speedText = simpleExoPlayerView.findViewById(R.id.speedText);
-        decreaseSpeed = simpleExoPlayerView.findViewById(R.id.decreaseSpeed);
-        speedControlGroup = simpleExoPlayerView.findViewById(R.id.speedControlGroup);
 
     }
 
@@ -391,6 +396,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         } else {
             if (isControlLocked) {
                 bottomContainer.setVisibility(View.GONE);
+                topContainer.setVisibility(View.VISIBLE);
                 topContainer.setBackground(null);
                 back.setVisibility(View.GONE);
                 title.setVisibility(View.GONE);
@@ -400,6 +406,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 controllerLock.setVisibility(View.VISIBLE);
             } else {
                 bottomContainer.setVisibility(View.VISIBLE);
+                topContainer.setVisibility(View.VISIBLE);
                 topContainer.setBackground(getResources().getDrawable(R.drawable.video_controller_gradiant_background_top));
                 back.setVisibility(View.VISIBLE);
                 title.setVisibility(View.VISIBLE);
@@ -408,31 +415,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 speedControlGroup.setVisibility(View.VISIBLE);
                 controllerLock.setVisibility(View.VISIBLE);
             }
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        setPlayerConstraints();
-        super.onConfigurationChanged(newConfig);
-    }
-
-    private void setPlayerConstraints() {
-        int orientation = getResources().getConfiguration().orientation;
-        ConstraintSet set = new ConstraintSet();
-        set.clone(constraintlayout);
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            hideSystemUI();
-            set.connect(simpleExoPlayerView.getId(), ConstraintSet.BOTTOM, constraintlayout.getId(), ConstraintSet.BOTTOM, 0);
-            set.constrainHeight(R.id.simpleExoPlayerView, 0);
-            set.applyTo(constraintlayout);
-        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            showSystemUI();
-            set.connect(simpleExoPlayerView.getId(), ConstraintSet.TOP, constraintlayout.getId(), ConstraintSet.TOP, 0);
-            set.clear(R.id.simpleExoPlayerView, ConstraintSet.BOTTOM);
-            int heightDpToPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, getResources().getDisplayMetrics());
-            set.constrainHeight(R.id.simpleExoPlayerView, heightDpToPx);
-            set.applyTo(constraintlayout);
         }
     }
 
@@ -474,6 +456,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         float newDuration = currentDuration;
         controllerVisibility();
         simpleExoPlayerView.showController();
+        int verticalScrollThreshold = 500;
         if (motionDownXPosition > event.getX()) { //swiped left
             newDuration = currentDuration - verticalScrollThreshold;
         } else if (motionDownXPosition < event.getX()) { //swiped right
@@ -516,13 +499,14 @@ public class VideoPlayerActivity extends AppCompatActivity {
         return newValue;
     }
 
-    private int[] getScreenHeightWidth() {
-        int[] heightWidth = new int[2];
-        Point size = new Point();
-        getWindowManager().getDefaultDisplay().getSize(size);
-        heightWidth[0] = size.x;  //width
-        heightWidth[1] = size.y;  //height
-        return heightWidth;
+    private void resetValues() {
+        motionDownXPosition = 0;
+        motionDownYPosition = 0;
+        isControllingVolume = false;
+        isControllingBrightness = false;
+        isHorizontalScrolling = false;
+        isVerticalScrolling = false;
+        isControllingPlayback = false;
     }
 
     private void setDataToFields(VideoResponse body) {
@@ -531,7 +515,26 @@ public class VideoPlayerActivity extends AppCompatActivity {
         title.setText(body.getTitle());
         if (player != null) {
             speed = player.getPlaybackParameters().speed;
-            //speedText.setText(String.format("%s x", speed));
+            speedText.setText(String.format("%s x", String.format(Locale.ENGLISH, "%.2f", speed)));
+        }
+    }
+
+    private void setPlayerConstraints() {
+        int orientation = getResources().getConfiguration().orientation;
+        ConstraintSet set = new ConstraintSet();
+        set.clone(constraintlayout);
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            hideSystemUI();
+            set.connect(simpleExoPlayerView.getId(), ConstraintSet.BOTTOM, constraintlayout.getId(), ConstraintSet.BOTTOM, 0);
+            set.constrainHeight(R.id.simpleExoPlayerView, 0);
+            set.applyTo(constraintlayout);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            showSystemUI();
+            set.connect(simpleExoPlayerView.getId(), ConstraintSet.TOP, constraintlayout.getId(), ConstraintSet.TOP, 0);
+            set.clear(R.id.simpleExoPlayerView, ConstraintSet.BOTTOM);
+            int heightDpToPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, getResources().getDisplayMetrics());
+            set.constrainHeight(R.id.simpleExoPlayerView, heightDpToPx);
+            set.applyTo(constraintlayout);
         }
     }
 
@@ -541,7 +544,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         simpleExoPlayerView.setUseController(true);
         DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "exo-player"));
         MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(sources));
-        simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+        simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
         player.prepare(mediaSource);
         player.setPlayWhenReady(true);
 
@@ -554,6 +557,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
                         progress.setVisibility(View.VISIBLE);
                         break;
                     case Player.STATE_ENDED:
+                        if(isRepeatEnabled){
+                            player.seekTo(0);
+                        }
                         break;
                     case Player.STATE_IDLE:
                         break;
@@ -567,6 +573,46 @@ public class VideoPlayerActivity extends AppCompatActivity {
         });
     }
 
+    private void findIds() {
+        constraintlayout = findViewById(R.id.constraintLayout);
+        simpleExoPlayerView = findViewById(R.id.simpleExoPlayerView);
+        description = findViewById(R.id.description);
+        progress = findViewById(R.id.progress);
+
+        bottomContainer = simpleExoPlayerView.findViewById(R.id.bottomContainer);
+        screenRotation = simpleExoPlayerView.findViewById(R.id.screenRotation);
+        backwardPlayback = simpleExoPlayerView.findViewById(R.id.backwardPlayback);
+        playPause = simpleExoPlayerView.findViewById(R.id.playPause);
+        forwardPlayback = simpleExoPlayerView.findViewById(R.id.forwardPlayback);
+        repeatOnOff = simpleExoPlayerView.findViewById(R.id.repeatOnOff);
+        aspectRatio = simpleExoPlayerView.findViewById(R.id.aspectRatio);
+
+        topContainer = simpleExoPlayerView.findViewById(R.id.topContainer);
+        back = simpleExoPlayerView.findViewById(R.id.back);
+        title = simpleExoPlayerView.findViewById(R.id.title);
+        controllerLock = simpleExoPlayerView.findViewById(R.id.controllerLock);
+        volumeMute = simpleExoPlayerView.findViewById(R.id.volumeMute);
+
+
+        brightnessVolumeImage = simpleExoPlayerView.findViewById(R.id.brightnessVolumeImage);
+        counter = simpleExoPlayerView.findViewById(R.id.counter);
+        counterGroup = simpleExoPlayerView.findViewById(R.id.counterGroup);
+
+        increaseSpeed = simpleExoPlayerView.findViewById(R.id.increaseSpeed);
+        speedText = simpleExoPlayerView.findViewById(R.id.speedText);
+        decreaseSpeed = simpleExoPlayerView.findViewById(R.id.decreaseSpeed);
+        speedControlGroup = simpleExoPlayerView.findViewById(R.id.speedControlGroup);
+
+    }
+
+    private int[] getScreenHeightWidth() {
+        int[] heightWidth = new int[2];
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        heightWidth[0] = size.x;  //width
+        heightWidth[1] = size.y;  //height
+        return heightWidth;
+    }
 
     private void hideSystemUI() {
         View decorView = getWindow().getDecorView();
@@ -583,6 +629,12 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private void showSystemUI() {
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        setPlayerConstraints();
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override

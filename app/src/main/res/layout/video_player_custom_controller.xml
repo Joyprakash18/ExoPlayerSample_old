@@ -180,6 +180,30 @@
             app:srcCompat="@drawable/ic_screen_rotation"
             tools:visibility="visible" />
 
+        <ImageView
+            android:id="@+id/repeatOnOff"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_repeat_off"
+            app:layout_constraintBottom_toBottomOf="@+id/screenRotation"
+            app:layout_constraintStart_toEndOf="@+id/screenRotation"
+            app:layout_constraintTop_toTopOf="@+id/screenRotation" />
+
+        <TextView
+            android:id="@+id/aspectRatio"
+            android:layout_width="44dp"
+            android:layout_height="26dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/border"
+            android:text="Fit"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="@+id/playPause"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/playPause" />
+
 
     </android.support.constraint.ConstraintLayout>
 
@@ -246,7 +270,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="#40000000"
-        android:text="1.00 x"
+        tools:text="1.00 x"
         android:textColor="@color/colorWhite"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/bottomContainer"
