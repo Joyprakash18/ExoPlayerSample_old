@@ -1,5 +1,6 @@
 package com.dc.exoplayersample.audio;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -47,6 +48,7 @@ public class AudioPlayerActivity extends AppCompatActivity {
         findIDs();
         clickListener();
         callVideoApi();
+
     }
 
     private void setRepeatOnOff() {
@@ -118,6 +120,13 @@ public class AudioPlayerActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
                         setDataToFields(response.body());
+                        Intent intent = new Intent(AudioPlayerActivity.this,AudioPlayerService.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("source",response.body().getSources());
+                        bundle.putString("title",response.body().getTitle());
+                        bundle.putString("thumbnail",response.body().getThumb());
+                        intent.putExtra("data", bundle);
+                        Util.startForegroundService(AudioPlayerActivity.this,intent);
                     }
                 }
             }

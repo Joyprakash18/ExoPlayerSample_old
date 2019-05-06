@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ExoPlayerSample</string>
+    <string name="audio_player_name">Audio</string>
 </resources>
