@@ -6,4 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".audio.AudioPlayerActivity">
 
+    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+        android:id="@+id/simpleExoPlayerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:controller_layout_id="@layout/audio_player_custom_controller"/>
+
+
+
+
 </android.support.constraint.ConstraintLayout>
