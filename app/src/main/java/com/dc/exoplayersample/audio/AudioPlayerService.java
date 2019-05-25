@@ -6,10 +6,12 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 
 import com.dc.exoplayersample.R;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -39,7 +41,7 @@ public class AudioPlayerService extends Service {
         DefaultDataSourceFactory defaultDataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "AudioDemo"));
         MediaSource mediaSource = new ExtractorMediaSource.Factory(defaultDataSourceFactory).createMediaSource(Uri.parse(source));
         player.prepare(mediaSource);
-        //player.setPlayWhenReady(true);
+        player.setPlayWhenReady(true);
 
         playerNoticiationManager = PlayerNotificationManager.createWithNotificationChannel(
                 getBaseContext(), "200", R.string.audio_player_name, 1,
@@ -81,6 +83,8 @@ public class AudioPlayerService extends Service {
         });
 
         playerNoticiationManager.setPlayer(player);
+        playerNoticiationManager.setUseNavigationActions(false);
+        
     }
 
     @Nullable
