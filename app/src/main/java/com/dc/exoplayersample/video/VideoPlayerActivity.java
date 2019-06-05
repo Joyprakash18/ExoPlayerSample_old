@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -70,6 +71,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private Group speedControlGroup;
     private ImageView repeatOnOff;
     private TextView aspectRatio;
+    private TextView pictureInPicture;
 
     private AudioManager audioManager;
 
@@ -83,6 +85,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private boolean isControllingPlayback = false;
     private boolean isVolumeMute = false;
     private boolean isRepeatEnabled = false;
+    private boolean iWantToBeInPipModeNow = false;
 
     private float speed = 0;
     private int brightness = 0;
@@ -179,6 +182,13 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 setAspectRatio();
             }
         });
+        pictureInPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPictureInPictureMode();
+                simpleExoPlayerView.setUseController(false);
+            }
+        });
         simpleExoPlayerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -203,6 +213,12 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void setPictureInPictureMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            enterPictureInPictureMode();
+        }
     }
 
     private void setRepeatOnOff() {
@@ -589,6 +605,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         forwardPlayback = simpleExoPlayerView.findViewById(R.id.forwardPlayback);
         repeatOnOff = simpleExoPlayerView.findViewById(R.id.repeatOnOff);
         aspectRatio = simpleExoPlayerView.findViewById(R.id.aspectRatio);
+        pictureInPicture = simpleExoPlayerView.findViewById(R.id.pictureInPicture);
 
         topContainer = simpleExoPlayerView.findViewById(R.id.topContainer);
         back = simpleExoPlayerView.findViewById(R.id.back);
@@ -642,9 +659,20 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        if (player != null) {
-            player.setPlayWhenReady(false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (player != null) {
+                if(isInPictureInPictureMode()){
+                    player.setPlayWhenReady(isPlaying);
+                }else{
+                    player.setPlayWhenReady(isPlaying);
+                }
+            }
+        }else{
+            if (player != null) {
+                player.setPlayWhenReady(false);
+            }
         }
+
         super.onPause();
     }
 
@@ -653,6 +681,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         super.onResume();
         if (player != null) {
             player.setPlayWhenReady(true);
+            simpleExoPlayerView.setUseController(true);
         }
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             hideSystemUI();

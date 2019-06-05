@@ -204,6 +204,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/playPause" />
 
+        <TextView
+            android:id="@+id/pictureInPicture"
+            android:layout_width="30dp"
+            android:layout_height="26dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/border"
+            android:gravity="center"
+            android:text="PiP"
+            android:textColor="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="@+id/aspectRatio"
+            app:layout_constraintEnd_toStartOf="@+id/aspectRatio"
+            app:layout_constraintTop_toTopOf="@+id/aspectRatio" />
+
 
     </android.support.constraint.ConstraintLayout>
 

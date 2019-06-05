@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.dc.exoplayersample">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -11,11 +12,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".adaptivestreaming.AdaptiveStreamingActivity"></activity>
+        <activity android:name=".adaptivestreaming.AdaptiveStreamingActivity"/>
         <activity android:name=".audio.AudioPlayerActivity" />
         <activity
             android:name=".video.VideoPlayerActivity"
-            android:configChanges="orientation|screenSize|layoutDirection" />
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|screenSize|layoutDirection"
+            tools:targetApi="n" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
