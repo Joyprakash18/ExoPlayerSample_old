@@ -7,7 +7,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface ApiInterface {
-    @GET("u8vz8")
+    @GET("a1k1v")
     Call<VideoResponse> getVideo();
 
     @GET("th3to")
