@@ -1,7 +1,9 @@
 package com.dc.exoplayersample.video;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Point;
@@ -38,7 +40,9 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -186,6 +190,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setPictureInPictureMode();
+                navToLauncherTask(VideoPlayerActivity.this);
                 simpleExoPlayerView.setUseController(false);
             }
         });
@@ -198,7 +203,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
                             motionDownXPosition = event.getX();
                             motionDownYPosition = event.getY();
                             break;
-                        case MotionEvent.ACTION_MOVE:
+                        case MotionEvent.ACTION_MOVE:setPictureInPictureMode();
+                            navToLauncherTask(VideoPlayerActivity.this);
+                            simpleExoPlayerView.setUseController(false);
                             handleTouchEvent(event);
                             break;
                         case MotionEvent.ACTION_UP:
@@ -592,6 +599,20 @@ public class VideoPlayerActivity extends AppCompatActivity {
         });
     }
 
+    public static void navToLauncherTask(Context appContext) {
+        ActivityManager activityManager = (ActivityManager) appContext.getSystemService(Context.ACTIVITY_SERVICE);
+        assert activityManager != null;
+        final List<ActivityManager.AppTask> appTasks = activityManager.getAppTasks();
+        for (ActivityManager.AppTask task : appTasks) {
+            final Intent baseIntent = task.getTaskInfo().baseIntent;
+            final Set<String> categories = baseIntent.getCategories();
+            if (categories != null && categories.contains(Intent.CATEGORY_LAUNCHER)) {
+                task.finishAndRemoveTask();
+                return;
+            }
+        }
+    }
+
     private void findIds() {
         constraintlayout = findViewById(R.id.constraintLayout);
         simpleExoPlayerView = findViewById(R.id.simpleExoPlayerView);
@@ -658,6 +679,13 @@ public class VideoPlayerActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onUserLeaveHint() {
+        setPictureInPictureMode();
+        navToLauncherTask(VideoPlayerActivity.this);
+        simpleExoPlayerView.setUseController(false);
+    }
+
+    @Override
     protected void onPause() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (player != null) {
@@ -687,5 +715,4 @@ public class VideoPlayerActivity extends AppCompatActivity {
             hideSystemUI();
         }
     }
-
 }

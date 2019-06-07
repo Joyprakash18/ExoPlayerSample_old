@@ -16,10 +16,17 @@
         <activity android:name=".audio.AudioPlayerActivity" />
         <activity
             android:name=".video.VideoPlayerActivity"
-            android:resizeableActivity="true"
-            android:supportsPictureInPicture="true"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|screenSize|layoutDirection"
-            tools:targetApi="n" />
+            tools:targetApi="n"
+            android:taskAffinity=".video.VideoPlayerActivity"
+            android:supportsPictureInPicture="true"
+            android:parentActivityName=".MainActivity"
+            android:launchMode="singleTask"
+            android:resizeableActivity="true"
+            android:autoRemoveFromRecents="true"
+            android:excludeFromRecents="true"
+            android:allowTaskReparenting="true"
+            android:screenOrientation="portrait"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
