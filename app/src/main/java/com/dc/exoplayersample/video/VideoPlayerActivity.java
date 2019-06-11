@@ -690,11 +690,13 @@ public class VideoPlayerActivity extends AppCompatActivity {
                     player.setPlayWhenReady(isPlaying);
                 }else{
                     player.setPlayWhenReady(false);
+                    player = null;
                 }
             }
         }else{
             if (player != null) {
                 player.setPlayWhenReady(false);
+                player = null;
             }
         }
 
