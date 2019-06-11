@@ -106,17 +106,35 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
                 Format quality = trackGroups.get(0).getFormat(i);
                 qualityList.add(quality);
             }
-            setPopupMenu();
         }
     }
 
-    private void setPopupMenu(){
+    private void showPopupMenu(){
         if (qualityList != null && qualityList.size() > 0) {
             popupMenu = new PopupMenu(AdaptiveStreamingActivity.this, setting);
             popupMenu.getMenu().add(1, 0, 1, "Auto");
             for (int i = 0; i < qualityList.size(); i++) {
                 popupMenu.getMenu().add(1, i + 1, i + 2, String.valueOf(qualityList.get(i).height));
             }
+            popupMenu.show();
+
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    if (item.getItemId() == 0) {
+                        Toast.makeText(AdaptiveStreamingActivity.this, "auto", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (defaultTrackSelector != null) {
+                            int bitrate = qualityList.get(item.getItemId() - 1).bitrate;
+                            defaultTrackSelector.setParameters(defaultTrackSelector.buildUponParameters()
+                                    .setMaxVideoBitrate(bitrate)
+                                    .build()
+                            );
+                        }
+                    }
+                    return false;
+                }
+            });
         }
     }
 
@@ -141,37 +159,15 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(popupMenu != null){
-                    popupMenu.show();
-                }
+                showPopupMenu();
             }
         });
-
-        if (popupMenu != null) {
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    if (item.getItemId() == 0) {
-                        Toast.makeText(AdaptiveStreamingActivity.this, "auto", Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (defaultTrackSelector != null) {
-                            int bitrate = qualityList.get(item.getItemId() - 1).bitrate;
-                            defaultTrackSelector.setParameters(defaultTrackSelector.buildUponParameters()
-                                    .setMaxVideoBitrate(bitrate)
-                                    .build()
-                            );
-                        }
-                    }
-                    return false;
-                }
-            });
-        }
 
     }
 
     private void findIds() {
         simpleExoPlayerView = findViewById(R.id.simpleExoPlayerView);
-        progress = simpleExoPlayerView.findViewById(R.id.progress);
+        progress = findViewById(R.id.progress);
         playPause = simpleExoPlayerView.findViewById(R.id.playPause);
         setting = simpleExoPlayerView.findViewById(R.id.setting);
     }
