@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.dc.exoplayersample.MainActivity;
 import com.dc.exoplayersample.R;
 import com.dc.exoplayersample.api.ApiClient;
 import com.dc.exoplayersample.api.ApiInterface;
@@ -190,8 +191,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setPictureInPictureMode();
-                navToLauncherTask(VideoPlayerActivity.this);
-                simpleExoPlayerView.setUseController(false);
             }
         });
         simpleExoPlayerView.setOnTouchListener(new View.OnTouchListener() {
@@ -203,9 +202,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
                             motionDownXPosition = event.getX();
                             motionDownYPosition = event.getY();
                             break;
-                        case MotionEvent.ACTION_MOVE:setPictureInPictureMode();
-                            navToLauncherTask(VideoPlayerActivity.this);
-                            simpleExoPlayerView.setUseController(false);
+                        case MotionEvent.ACTION_MOVE:
                             handleTouchEvent(event);
                             break;
                         case MotionEvent.ACTION_UP:
@@ -225,6 +222,8 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private void setPictureInPictureMode() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             enterPictureInPictureMode();
+            navToLauncherTask(VideoPlayerActivity.this);
+            simpleExoPlayerView.setUseController(false);
         }
     }
 
@@ -681,8 +680,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
     @Override
     protected void onUserLeaveHint() {
         setPictureInPictureMode();
-        navToLauncherTask(VideoPlayerActivity.this);
-        simpleExoPlayerView.setUseController(false);
     }
 
     @Override
@@ -692,7 +689,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 if(isInPictureInPictureMode()){
                     player.setPlayWhenReady(isPlaying);
                 }else{
-                    player.setPlayWhenReady(isPlaying);
+                    player.setPlayWhenReady(false);
                 }
             }
         }else{
@@ -715,4 +712,5 @@ public class VideoPlayerActivity extends AppCompatActivity {
             hideSystemUI();
         }
     }
+
 }
