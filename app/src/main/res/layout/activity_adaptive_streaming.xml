@@ -10,11 +10,13 @@
         android:id="@+id/simpleExoPlayerView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:layout_marginTop="8dp"
         android:background="#000"
+        app:controller_layout_id="@layout/adaptive_stream_player_custom_controller"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:controller_layout_id="@layout/adaptive_stream_player_custom_controller"/>
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <ProgressBar
         android:id="@+id/progress"
@@ -24,5 +26,59 @@
         app:layout_constraintEnd_toEndOf="@+id/simpleExoPlayerView"
         app:layout_constraintStart_toStartOf="@+id/simpleExoPlayerView"
         app:layout_constraintTop_toTopOf="@+id/simpleExoPlayerView" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Playing HLS video" />
+
+    <Button
+        android:id="@+id/hlsButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="4dp"
+        android:text="HLS"
+        app:layout_constraintBottom_toBottomOf="@+id/dashButton"
+        app:layout_constraintEnd_toStartOf="@+id/dashButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/dashButton"
+        app:layout_constraintHorizontal_weight="1"/>
+
+    <Button
+        android:id="@+id/dashButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="4dp"
+        android:text="DASH"
+        app:layout_constraintEnd_toStartOf="@+id/smoothStreamButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/hlsButton"
+        app:layout_constraintTop_toBottomOf="@+id/simpleExoPlayerView"
+        app:layout_constraintHorizontal_weight="1"/>
+
+    <Button
+        android:id="@+id/smoothStreamButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="8dp"
+        android:text="Smooth Stream"
+        app:layout_constraintBottom_toBottomOf="@+id/dashButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/dashButton"
+        app:layout_constraintTop_toTopOf="@+id/dashButton"
+        app:layout_constraintHorizontal_weight="2"/>
 
 </android.support.constraint.ConstraintLayout>

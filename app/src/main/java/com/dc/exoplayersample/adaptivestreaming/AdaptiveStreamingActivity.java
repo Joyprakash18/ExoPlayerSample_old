@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -44,6 +45,11 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
     private ImageView setting;
     private TrackGroupArray trackGroups;
     private PopupMenu popupMenu;
+    private Button hlsButton;
+    private Button dashButton;
+    private Button smoothStreamButton;
+    private String lastButtonSelected;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,49 +58,7 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
 
         findIds();
         clickListener();
-        initializePlayer();
-    }
-
-    private void initializePlayer() {
-        TrackSelection.Factory adaptiveTrackSelection = new AdaptiveTrackSelection.Factory(new DefaultBandwidthMeter());
-        defaultTrackSelector = new DefaultTrackSelector(adaptiveTrackSelection);
-        player = ExoPlayerFactory.newSimpleInstance(
-                new DefaultRenderersFactory(AdaptiveStreamingActivity.this),
-                defaultTrackSelector,
-                new DefaultLoadControl());
-        simpleExoPlayerView.setPlayer(player);
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
-                this,
-                Util.getUserAgent(this, "exo-player"),
-                new DefaultBandwidthMeter());
-        MediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(hls_url));
-        player.prepare(mediaSource);
-        player.setPlayWhenReady(true);
-
-        player.addListener(new Player.DefaultEventListener() {
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                switch (playbackState) {
-
-                    case Player.STATE_BUFFERING:
-                        progress.setVisibility(View.VISIBLE);
-                        break;
-                    case Player.STATE_ENDED:
-                        player.seekTo(0);
-                        break;
-                    case Player.STATE_IDLE:
-                        break;
-                    case Player.STATE_READY:
-                        progress.setVisibility(View.GONE);
-                        getVideoQuality();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-
-
+        setCurrentVideo("HLS");
     }
 
     private void getVideoQuality() {
@@ -163,21 +127,150 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
             }
         });
 
+        hlsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (lastButtonSelected != null && !lastButtonSelected.equals("HLS")) {
+                    setCurrentVideo("HLS");
+                }
+            }
+        });
+
+        dashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (lastButtonSelected != null && !lastButtonSelected.equals("DASH")) {
+                    setCurrentVideo("DASH");
+                }
+            }
+        });
+
+        smoothStreamButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (lastButtonSelected != null && !lastButtonSelected.equals("SMOOTHSTREAM")) {
+                    setCurrentVideo("SMOOTHSTREAM");
+                }
+            }
+        });
+
+    }
+
+    private void setCurrentVideo(String currentVideoPlaying) {
+        setButtonEnabled(currentVideoPlaying);
+        lastButtonSelected = currentVideoPlaying;
+        switch (currentVideoPlaying) {
+            case "HLS":
+                initializeHLSPlayer();
+                break;
+            case "DASH":
+                initializeDASHPlayer();
+                break;
+            case "SMOOTHSTREAM":
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void initializeDASHPlayer() {
+
+    }
+
+    private void initializeHLSPlayer() {
+        clearPLayer();
+        TrackSelection.Factory adaptiveTrackSelection = new AdaptiveTrackSelection.Factory(new DefaultBandwidthMeter());
+        defaultTrackSelector = new DefaultTrackSelector(adaptiveTrackSelection);
+        player = ExoPlayerFactory.newSimpleInstance(
+                new DefaultRenderersFactory(AdaptiveStreamingActivity.this),
+                defaultTrackSelector,
+                new DefaultLoadControl());
+        simpleExoPlayerView.setPlayer(player);
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
+                this,
+                Util.getUserAgent(this, "exo-player"),
+                new DefaultBandwidthMeter());
+        MediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(hls_url));
+        player.prepare(mediaSource);
+        player.setPlayWhenReady(true);
+
+        player.addListener(new Player.DefaultEventListener() {
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                switch (playbackState) {
+
+                    case Player.STATE_BUFFERING:
+                        progress.setVisibility(View.VISIBLE);
+                        break;
+                    case Player.STATE_ENDED:
+                        player.seekTo(0);
+                        break;
+                    case Player.STATE_IDLE:
+                        break;
+                    case Player.STATE_READY:
+                        progress.setVisibility(View.GONE);
+                        getVideoQuality();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+    }
+
+    private void setButtonEnabled(String currentVideoPlaying) {
+        switch (currentVideoPlaying) {
+            case "HLS":
+                hlsButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                hlsButton.setTextColor(getResources().getColor(R.color.colorWhite));
+                dashButton.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                dashButton.setTextColor(getResources().getColor(R.color.colorBlack));
+                smoothStreamButton.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                smoothStreamButton.setTextColor(getResources().getColor(R.color.colorBlack));
+                break;
+            case "DASH":
+                hlsButton.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                hlsButton.setTextColor(getResources().getColor(R.color.colorBlack));
+                dashButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                dashButton.setTextColor(getResources().getColor(R.color.colorWhite));
+                smoothStreamButton.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                smoothStreamButton.setTextColor(getResources().getColor(R.color.colorBlack));
+                break;
+            case "SMOOTHSTREAM":
+                dashButton.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                dashButton.setTextColor(getResources().getColor(R.color.colorBlack));
+                dashButton.setBackgroundColor(getResources().getColor(R.color.colorGrey));
+                dashButton.setTextColor(getResources().getColor(R.color.colorBlack));
+                smoothStreamButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                smoothStreamButton.setTextColor(getResources().getColor(R.color.colorWhite));
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void clearPLayer() {
+        if (player != null) {
+            player.setPlayWhenReady(false);
+            defaultTrackSelector = null;
+            player = null;
+        }
     }
 
     private void findIds() {
         simpleExoPlayerView = findViewById(R.id.simpleExoPlayerView);
         progress = findViewById(R.id.progress);
+        hlsButton = findViewById(R.id.hlsButton);
+        dashButton = findViewById(R.id.dashButton);
+        smoothStreamButton = findViewById(R.id.smoothStreamButton);
+
         playPause = simpleExoPlayerView.findViewById(R.id.playPause);
         setting = simpleExoPlayerView.findViewById(R.id.setting);
     }
 
     @Override
     protected void onPause() {
-        if (player != null) {
-            player.setPlayWhenReady(false);
-            player = null;
-        }
+        clearPLayer();
         super.onPause();
     }
 }
