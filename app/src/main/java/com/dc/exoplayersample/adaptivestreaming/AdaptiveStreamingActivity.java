@@ -245,6 +245,7 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
                 smoothStreamButton.setTextColor(getResources().getColor(R.color.colorWhite));
                 break;
             default:
+
                 break;
         }
     }
