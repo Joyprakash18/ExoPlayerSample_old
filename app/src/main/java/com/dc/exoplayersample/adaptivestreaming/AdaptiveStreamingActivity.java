@@ -184,8 +184,8 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
         clearPLayer();
         isPlaying = true;
 
-
-        TrackSelection.Factory adaptiveTrackSelection = new AdaptiveTrackSelection.Factory(new DefaultBandwidthMeter());
+        DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory adaptiveTrackSelection = new AdaptiveTrackSelection.Factory(defaultBandwidthMeter);
         defaultTrackSelector = new DefaultTrackSelector(adaptiveTrackSelection);
         player = ExoPlayerFactory.newSimpleInstance(
                 new DefaultRenderersFactory(this),
@@ -198,7 +198,7 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
         DataSource.Factory manifestDataSourceFactory = new DefaultHttpDataSourceFactory("ua");
         DashChunkSource.Factory dashChunkSourceFactory =
                 new DefaultDashChunkSource.Factory(
-                        new DefaultHttpDataSourceFactory("ua", new DefaultBandwidthMeter())
+                        new DefaultHttpDataSourceFactory("ua", defaultBandwidthMeter)
                 );
         MediaSource mediaSource =
                 new DashMediaSource.Factory(
