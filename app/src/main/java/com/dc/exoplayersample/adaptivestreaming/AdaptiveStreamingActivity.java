@@ -20,6 +20,9 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.dash.DashChunkSource;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -28,6 +31,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
@@ -37,6 +41,7 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
     private PlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
     String hls_url = "https://playertest.longtailvideo.com/adaptive/bbbfull/bbbfull.m3u8";
+    String dash_url = "https://www.youtube.com/api/manifest/dash/id/3aa39fa2cc27967f/source/youtube?as=fmp4_audio_clear,fmp4_sd_hd_clear&sparams=ip,ipbits,expire,source,id,as&ip=0.0.0.0&ipbits=0&expire=19000000000&signature=A2716F75795F5D2AF0E88962FFCD10DB79384F29.84308FF04844498CE6FBCE4731507882B8307798&key=ik0";
     private ProgressBar progress;
     private boolean isPlaying = true;
     private ImageView playPause;
@@ -62,7 +67,7 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
     }
 
     private void getVideoQuality() {
-        if (defaultTrackSelector.getCurrentMappedTrackInfo() != null) {
+        if (defaultTrackSelector != null && defaultTrackSelector.getCurrentMappedTrackInfo() != null) {
             qualityList = new ArrayList<>();
             // 0 => video 1 => Audio
             trackGroups = defaultTrackSelector.getCurrentMappedTrackInfo().getTrackGroups(0);
@@ -70,6 +75,8 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
                 Format quality = trackGroups.get(0).getFormat(i);
                 qualityList.add(quality);
             }
+        }else{
+            qualityList = null;
         }
     }
 
@@ -103,6 +110,7 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
     }
 
     private void setPlayPause() {
+        isPlaying = !isPlaying;
         if (isPlaying) {
             player.setPlayWhenReady(false);
             playPause.setImageResource(R.drawable.ic_play);
@@ -110,7 +118,6 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
             player.setPlayWhenReady(true);
             playPause.setImageResource(R.drawable.ic_pause);
         }
-        isPlaying = !isPlaying;
     }
 
     private void clickListener() {
@@ -174,11 +181,63 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
     }
 
     private void initializeDASHPlayer() {
+        clearPLayer();
+        isPlaying = true;
 
+
+        TrackSelection.Factory adaptiveTrackSelection = new AdaptiveTrackSelection.Factory(new DefaultBandwidthMeter());
+        defaultTrackSelector = new DefaultTrackSelector(adaptiveTrackSelection);
+        player = ExoPlayerFactory.newSimpleInstance(
+                new DefaultRenderersFactory(this),
+                defaultTrackSelector,
+                new DefaultLoadControl()
+        );
+
+        simpleExoPlayerView.setPlayer(player);
+
+        DataSource.Factory manifestDataSourceFactory = new DefaultHttpDataSourceFactory("ua");
+        DashChunkSource.Factory dashChunkSourceFactory =
+                new DefaultDashChunkSource.Factory(
+                        new DefaultHttpDataSourceFactory("ua", new DefaultBandwidthMeter())
+                );
+        MediaSource mediaSource =
+                new DashMediaSource.Factory(
+                        dashChunkSourceFactory, manifestDataSourceFactory)
+                        .createMediaSource(Uri.parse(dash_url)
+                        );
+        player.prepare(mediaSource);
+        player.setPlayWhenReady(true);
+        setPlayPause();
+
+        player.addListener(new Player.DefaultEventListener() {
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                switch (playbackState) {
+
+                    case Player.STATE_BUFFERING:
+                        progress.setVisibility(View.VISIBLE);
+                        break;
+                    case Player.STATE_ENDED:
+                        player.seekTo(0);
+                        break;
+                    case Player.STATE_IDLE:
+                        break;
+                    case Player.STATE_READY:
+                        progress.setVisibility(View.GONE);
+                        getVideoQuality();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
+
 
     private void initializeHLSPlayer() {
         clearPLayer();
+        isPlaying = true;
+
         TrackSelection.Factory adaptiveTrackSelection = new AdaptiveTrackSelection.Factory(new DefaultBandwidthMeter());
         defaultTrackSelector = new DefaultTrackSelector(adaptiveTrackSelection);
         player = ExoPlayerFactory.newSimpleInstance(
@@ -193,6 +252,7 @@ public class AdaptiveStreamingActivity extends AppCompatActivity {
         MediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(hls_url));
         player.prepare(mediaSource);
         player.setPlayWhenReady(true);
+        setPlayPause();
 
         player.addListener(new Player.DefaultEventListener() {
             @Override
